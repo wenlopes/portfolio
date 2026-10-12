@@ -93,6 +93,18 @@ docs/              specs, ADRs, setup
 .claude/, CLAUDE.md   adaptados do pricemonitor
 ```
 
+### Blueprint: pricemonitor
+
+O projeto `/home/wendel/dev/projects/pricemonitor` é o blueprint de **boas práticas de código e arquitetura**. Só as regras são herdadas, não o código da aplicação. Fontes:
+
+- `CLAUDE.md`: organização de pacotes (domínio na raiz, `internal/` agnóstico ao domínio, um sub-pacote por backend, direção de dependência), interfaces e contratos (interface guards, `context.Context` primeiro, input structs), injeção de dependências, functional options, convenções gerais, tratamento de erros, testes, mocks, ordem de execução pós-mudança, proibição de commit pela IA.
+- `.claude/skills/arch-review` e `.claude/skills/test-review` (com as `references/`), e os comandos `review-arch` e `review-tests`: revisões automatizadas dessas regras.
+- `.claude/skills/gh-pr-review` e `.claude/skills/explain-code`.
+- `Makefile`: alvos `test`, `lint`, `mocks`, `tidy`, `docs-build`, `watch`.
+- `.gitignore`, `.air.toml`, `.github/copilot-instructions.md`, `.github/workflows/` (CI Go e workflows do Claude).
+
+O blueprint só existe na máquina do Wendel, então o ticket que o aplica precisa rodar localmente.
+
 Adaptações do `CLAUDE.md` do pricemonitor: trocar `pperr`/`instrument` por `fmt.Errorf("%w")` e `log/slog`; acrescentar seções de React/TypeScript, CloudFormation e a regra do travessão. Mantém a regra: a IA não faz commit, push, merge nem rebase.
 
 ## Stacks CloudFormation
