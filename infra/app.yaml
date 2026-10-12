@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: portfolio-app. Go Lambda (arm64) behind a Function URL; only the Visualização counter is exposed.
+
+Parameters:
+  DataStackName:
+    Type: String
+    Default: portfolio-data
+
+Resources:
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/portfolio-api
+      RetentionInDays: 14
+
+  FunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: logs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !GetAtt LogGroup.Arn
+        - PolicyName: views
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: dynamodb:UpdateItem
+                Resource:
+                  Fn::ImportValue: !Sub ${DataStackName}-TableArn
+
+  Function:
+    Type: AWS::Lambda::Function
+    DependsOn: LogGroup
+    Properties:
+      FunctionName: portfolio-api
+      Runtime: provided.al2023
+      Architectures:
+        - arm64
+      Handler: bootstrap
+      # Local path rewritten to S3 by `aws cloudformation package`.
+      Code: ../build/api.zip
+      MemorySize: 128
+      Timeout: 5
+      ReservedConcurrentExecutions: 5
+      Role: !GetAtt FunctionRole.Arn
+      LoggingConfig:
+        LogGroup: !Ref LogGroup
+        LogFormat: JSON
+      Environment:
+        Variables:
+          TABLE_NAME:
+            Fn::ImportValue: !Sub ${DataStackName}-TableName
+
+  FunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      TargetFunctionArn: !GetAtt Function.Arn
+      AuthType: AWS_IAM
+
+Outputs:
+  FunctionArn:
+    Value: !GetAtt Function.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-FunctionArn
+  FunctionUrl:
+    Value: !GetAtt FunctionUrl.FunctionUrl
+    Export:
+      Name: !Sub ${AWS::StackName}-FunctionUrl
