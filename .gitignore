@@ -1,1 +1,30 @@
+# Test binary, built with "go test -c".
+*.test
+
+# Go coverage output.
+*.out
+
+# Go workspace file.
+go.work
+
+# Build output (Lambda bootstrap, packaged templates) and air.
 build/
+tmp/
+
+# Node.
+node_modules/
+web/dist/
+web/test-results/
+web/playwright-report/
+
+# IDE specific files.
+.vscode
+.idea
+
+# Env files.
+.env
+.env.*
+!.env.example
+
+# OS X generated file.
+.DS_Store

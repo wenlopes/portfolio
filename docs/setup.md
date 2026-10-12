@@ -17,12 +17,12 @@ Convenções:
 | --- | --- | --- |
 | Go 1.25+ | API, export, testes | `go version` |
 | Node 24 LTS + npm | React, Vite, Playwright | `node -v` |
-| Docker | MiniStack | `docker info` |
+| GNU Make | alvos do `Makefile` | `make --version` |
+| Docker | MiniStack, AWS CLI local e cfn-lint (rodam em container) | `docker info` |
 | AWS CLI v2 | deploy e acesso aos dados | `aws --version` |
 | GitHub CLI | repo, rebuild | `gh --version` |
 | golangci-lint | lint Go | `golangci-lint version` |
 | mockgen (`go.uber.org/mock`) | mocks | `mockgen -version` |
-| cfn-lint | validar templates | `cfn-lint --version` |
 
 Depois do primeiro `npm install` em `web/`:
 
@@ -227,10 +227,13 @@ Os Posts importados chegam como rascunho no dev.to; você revisa e publica lá.
 ```bash
 make up            # sobe MiniStack
 make deploy-local  # stacks data + app no MiniStack
-make run           # API Go local
-make painel        # Painel apontando para o MiniStack (ou prod, com AWS_PROFILE)
-make test          # Go + Vitest
-make e2e           # Playwright
+make run           # API Go local (:8080)
+make watch         # API Go com live reload (air)
+make test          # unit + integração no MiniStack + coverage (precisa de up + deploy-local)
+make test-unit     # só unit, sem MiniStack
+make lint          # golangci-lint + cfn-lint
+make painel        # Painel apontando para o MiniStack (ou prod, com AWS_PROFILE); chega na entrega 3
+make e2e           # Playwright; chega na entrega 6
 ```
 
 ---

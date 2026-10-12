@@ -44,7 +44,12 @@ Resources:
 
   Function:
     Type: AWS::Lambda::Function
-    DependsOn: LogGroup
+    Metadata:
+      cfn-lint:
+        config:
+          # Code is a local path on purpose; `aws cloudformation package` rewrites it to S3.
+          ignore_checks:
+            - W3002
     Properties:
       FunctionName: portfolio-api
       Runtime: provided.al2023
